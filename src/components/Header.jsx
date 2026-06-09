@@ -49,7 +49,12 @@ export default function Header() {
           {/* 데스크탑 메뉴 */}
           <ul className="hidden items-stretch lg:flex">
             {nav.map((item) => (
-              <li key={item.label} className="flex items-center" onMouseEnter={() => setHovered(item.label)}>
+              <li
+                key={item.label}
+                className="relative flex items-center"
+                onMouseEnter={() => setHovered(item.label)}
+                onMouseLeave={() => setHovered(null)}
+              >
                 <NavLink
                   to={item.to}
                   className={({ isActive }) =>
@@ -63,6 +68,23 @@ export default function Header() {
                 >
                   {item.label}
                 </NavLink>
+
+                {/* 세로 드롭다운 */}
+                {hovered === item.label && (
+                  <ul className="absolute left-1/2 top-full z-50 min-w-[9rem] -translate-x-1/2 overflow-hidden rounded-xl border border-neutral-200 dark:border-navy-700 bg-white dark:bg-navy-900 shadow-lg py-2">
+                    {item.children.map((c) => (
+                      <li key={c.label + c.to}>
+                        <Link
+                          to={c.to}
+                          onClick={() => setHovered(null)}
+                          className="block whitespace-nowrap px-5 py-2.5 text-sm font-semibold text-neutral-600 dark:text-neutral-400 transition hover:bg-royal/10 dark:hover:bg-sky/10 hover:text-royal dark:hover:text-sky"
+                        >
+                          {c.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>
@@ -91,36 +113,6 @@ export default function Header() {
           </div>
         </div>
 
-        {/* 데스크탑 메가 서브메뉴 — 호버된 메뉴의 서브아이템을 가로 한 줄로 표시 */}
-        <div
-          className={[
-            'hidden overflow-hidden border-b border-neutral-200 dark:border-navy-700 bg-white dark:bg-navy-900 transition-all duration-200 lg:block',
-            hovered ? 'max-h-20 opacity-100' : 'max-h-0 border-b-0 opacity-0',
-          ].join(' ')}
-        >
-          <div className="mx-auto flex max-w-container items-center justify-end px-20">
-            {nav.map((item) =>
-              hovered === item.label ? (
-                <ul key={item.label} className="flex items-center gap-1 py-4">
-                  {item.children.map((c, idx) => (
-                    <li key={c.label + c.to} className="flex items-center">
-                      <Link
-                        to={c.to}
-                        onClick={() => setHovered(null)}
-                        className="whitespace-nowrap px-4 py-2 text-sm font-semibold text-neutral-600 dark:text-neutral-400 transition rounded-full hover:bg-royal/10 dark:hover:bg-sky/10 hover:text-royal dark:hover:text-sky"
-                      >
-                        {c.label}
-                      </Link>
-                      {idx < item.children.length - 1 && (
-                        <span className="h-3 w-px bg-neutral-200 dark:bg-navy-600" />
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              ) : null
-            )}
-          </div>
-        </div>
       </nav>
 
       {/* 모바일 패널 */}
