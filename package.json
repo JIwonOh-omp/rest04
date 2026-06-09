@@ -1,9 +1,9 @@
 {
-  "name": "rest03",
+  "name": "aiedu",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "회사 사이트 템플릿 (건설사) - React + Vite + Tailwind",
+  "description": "AI 온라인 교육 플랫폼 - React + Vite + Tailwind",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

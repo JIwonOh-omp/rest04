@@ -7,37 +7,45 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply font-sans text-neutral-900 antialiased;
+    @apply font-sans antialiased bg-white text-neutral-900 transition-colors duration-200;
+  }
+  .dark body {
+    @apply bg-navy-950 text-neutral-100;
+  }
+  /* dark mode: html 클래스로 직접 body 컬러 적용 */
+  html.dark {
+    @apply bg-navy-950;
+  }
+  html.dark body {
+    @apply bg-navy-950 text-neutral-100;
   }
 }
 
 @layer components {
-  /* 우측 화살표가 붙은 둥근 버튼 (소스의 btn-arrow 스타일) */
-  .btn-pill {
-    @apply inline-flex items-center gap-3 rounded-full bg-neutral-100 py-4 pl-6 pr-12 font-bold transition hover:bg-neutral-200;
-  }
-  .btn-pill::after {
-    content: '→';
-    @apply absolute right-5 text-neutral-500;
-  }
-
-  /* 섹션 공통 좌우 여백 */
   .section-x {
     @apply px-4 md:px-10 lg:px-24 xl:px-40;
   }
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded-full bg-royal px-6 py-3 font-bold text-white transition hover:bg-royal-deep;
+  }
+  .btn-outline {
+    @apply inline-flex items-center gap-2 rounded-full border border-royal px-6 py-3 font-bold text-royal transition hover:bg-royal hover:text-white dark:border-sky dark:text-sky dark:hover:bg-sky dark:hover:text-navy-950;
+  }
+  .btn-pill {
+    @apply relative inline-flex items-center gap-3 rounded-full bg-neutral-100 py-4 pl-6 pr-14 font-bold transition hover:bg-neutral-200 dark:bg-navy-800 dark:text-white dark:hover:bg-navy-700;
+  }
+  /* YouTube 반응형 컨테이너 */
+  .yt-container {
+    @apply relative w-full overflow-hidden rounded-xl;
+    padding-top: 56.25%;
+  }
+  .yt-container iframe {
+    @apply absolute inset-0 h-full w-full;
+  }
 }
 
-/* 히어로 슬라이더 페이드 */
 @keyframes heroFade {
-  0%,
-  45% {
-    opacity: 1;
-  }
-  50%,
-  95% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+  0%, 45%  { opacity: 1; }
+  50%, 95% { opacity: 0; }
+  100%     { opacity: 1; }
 }
