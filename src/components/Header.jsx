@@ -91,34 +91,34 @@ export default function Header() {
           </div>
         </div>
 
-        {/* 데스크탑 메가 서브메뉴 */}
+        {/* 데스크탑 메가 서브메뉴 — 호버된 메뉴의 서브아이템을 가로 한 줄로 표시 */}
         <div
           className={[
             'hidden overflow-hidden border-b border-neutral-200 dark:border-navy-700 bg-white dark:bg-navy-900 transition-all duration-200 lg:block',
-            hovered ? 'max-h-60 opacity-100' : 'max-h-0 border-b-0 opacity-0',
+            hovered ? 'max-h-20 opacity-100' : 'max-h-0 border-b-0 opacity-0',
           ].join(' ')}
         >
-          <div className="mx-auto flex max-w-container justify-end px-20">
-            {nav.map((item) => (
-              <ul
-                key={item.label}
-                className="flex w-40 flex-col gap-3 py-6"
-                onMouseEnter={() => setHovered(item.label)}
-              >
-                {hovered === item.label &&
-                  item.children.map((c) => (
-                    <li key={c.label + c.to}>
+          <div className="mx-auto flex max-w-container items-center justify-end px-20">
+            {nav.map((item) =>
+              hovered === item.label ? (
+                <ul key={item.label} className="flex items-center gap-1 py-4">
+                  {item.children.map((c, idx) => (
+                    <li key={c.label + c.to} className="flex items-center">
                       <Link
                         to={c.to}
                         onClick={() => setHovered(null)}
-                        className="block text-center text-sm text-neutral-600 dark:text-neutral-400 transition hover:font-semibold hover:text-royal dark:hover:text-sky"
+                        className="whitespace-nowrap px-4 py-2 text-sm font-semibold text-neutral-600 dark:text-neutral-400 transition rounded-full hover:bg-royal/10 dark:hover:bg-sky/10 hover:text-royal dark:hover:text-sky"
                       >
                         {c.label}
                       </Link>
+                      {idx < item.children.length - 1 && (
+                        <span className="h-3 w-px bg-neutral-200 dark:bg-navy-600" />
+                      )}
                     </li>
                   ))}
-              </ul>
-            ))}
+                </ul>
+              ) : null
+            )}
           </div>
         </div>
       </nav>
