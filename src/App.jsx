@@ -3,6 +3,7 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
 import ScrollToTopButton from './components/ScrollToTopButton'
+import ProtectedRoute from './components/ProtectedRoute'
 
 import Home from './pages/Home'
 import About from './pages/About'
@@ -10,6 +11,9 @@ import Courses from './pages/Courses'
 import Videos from './pages/Videos'
 import Support from './pages/Support'
 import SimplePage from './pages/SimplePage'
+import Login from './pages/Login'
+import BoardDetail from './pages/BoardDetail'
+import AdminWrite from './pages/AdminWrite'
 
 export default function App() {
   return (
@@ -35,6 +39,20 @@ export default function App() {
           {/* 고객센터 */}
           <Route path="/support" element={<Navigate to="/support/notice" replace />} />
           <Route path="/support/:tab" element={<Support />} />
+          <Route path="/support/notice/:id" element={<BoardDetail />} />
+
+          {/* 인증 */}
+          <Route path="/login" element={<Login />} />
+
+          {/* 관리자 */}
+          <Route
+            path="/admin/write"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminWrite />
+              </ProtectedRoute>
+            }
+          />
 
           {/* 법적 페이지 */}
           <Route path="/privacy" element={<SimplePage title="개인정보처리방침" />} />

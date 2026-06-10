@@ -1,35 +1,94 @@
-import { useState } from 'react'
-import { useParams, Navigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useParams, Navigate, useNavigate } from 'react-router-dom'
 import SubPageLayout from '../components/SubPageLayout'
-import { supportTabs, notices, faqs } from '../data/site'
+import { supportTabs, faqs } from '../data/site'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext'
+
+const fmt = (d) =>
+  new Date(d).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
 
 function Notice() {
+  const { isAdmin }           = useAuth()
+  const navigate              = useNavigate()
+  const [posts, setPosts]     = useState([])
+  const [loading, setLoading] = useState(true)
+  const [page, setPage]       = useState(1)
+  const PER_PAGE = 10
+
+  useEffect(() => {
+    supabase
+      .from('posts')
+      .select('id, title, created_at')
+      .eq('category', 'notice')
+      .order('created_at', { ascending: false })
+      .then(({ data }) => { setPosts(data ?? []); setLoading(false) })
+  }, [])
+
+  const total = Math.ceil(posts.length / PER_PAGE)
+  const slice = posts.slice((page - 1) * PER_PAGE, page * PER_PAGE)
+
+  if (loading) return (
+    <div className="flex justify-center py-20">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-royal dark:border-sky border-t-transparent" />
+    </div>
+  )
+
   return (
     <div className="mx-auto max-w-container px-4 md:px-10 lg:px-20">
+      {isAdmin && (
+        <div className="mb-4 flex justify-end">
+          <button
+            onClick={() => navigate('/admin/write')}
+            className="rounded-xl bg-royal dark:bg-sky px-5 py-2.5 text-sm font-bold text-white dark:text-navy-950 transition hover:brightness-110"
+          >+ 글쓰기</button>
+        </div>
+      )}
       <div className="overflow-hidden rounded-2xl border border-neutral-200 dark:border-navy-700">
-        {/* 헤더 */}
         <div className="hidden grid-cols-[1fr_auto] border-b border-neutral-200 dark:border-navy-700 bg-neutral-50 dark:bg-navy-800 px-6 py-4 text-sm font-bold text-neutral-500 dark:text-neutral-400 md:grid">
           <span>제목</span>
           <span>날짜</span>
         </div>
-        {/* 목록 */}
-        <ul className="divide-y divide-neutral-100 dark:divide-navy-700">
-          {notices.map((n) => (
-            <li key={n.id}>
-              <button
-                type="button"
-                className="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-1 px-6 py-5 text-left transition hover:bg-neutral-50 dark:hover:bg-navy-800"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="shrink-0 rounded-full bg-royal/10 dark:bg-sky/10 px-2.5 py-0.5 text-xs font-bold text-royal dark:text-sky">공지</span>
-                  <span className="font-semibold text-neutral-800 dark:text-neutral-200">{n.title}</span>
-                </div>
-                <span className="text-sm text-neutral-400 md:ml-4 shrink-0">{n.date}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
+        {slice.length === 0 ? (
+          <div className="py-20 text-center text-sm text-neutral-400 dark:text-neutral-500">
+            등록된 공지사항이 없습니다.
+          </div>
+        ) : (
+          <ul className="divide-y divide-neutral-100 dark:divide-navy-700">
+            {slice.map((n) => (
+              <li key={n.id}>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/support/notice/${n.id}`)}
+                  className="w-full flex flex-col md:flex-row md:items-center md:justify-between gap-1 px-6 py-5 text-left transition hover:bg-neutral-50 dark:hover:bg-navy-800"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="shrink-0 rounded-full bg-royal/10 dark:bg-sky/10 px-2.5 py-0.5 text-xs font-bold text-royal dark:text-sky">공지</span>
+                    <span className="font-semibold text-neutral-800 dark:text-neutral-200">{n.title}</span>
+                  </div>
+                  <span className="text-sm text-neutral-400 md:ml-4 shrink-0">{fmt(n.created_at)}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
+      {total > 1 && (
+        <div className="mt-6 flex justify-center gap-2">
+          {Array.from({ length: total }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setPage(i + 1)}
+              className={[
+                'h-9 w-9 rounded-xl text-sm font-semibold transition',
+                page === i + 1
+                  ? 'bg-royal dark:bg-sky text-white dark:text-navy-950'
+                  : 'border border-neutral-200 dark:border-navy-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-navy-800',
+              ].join(' ')}
+            >{i + 1}</button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

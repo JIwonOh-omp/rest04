@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { nav, company } from '../data/site'
 import { useTheme } from '../context/ThemeContext'
+import { useAuth } from '../context/AuthContext'
 
 function SunIcon() {
   return (
@@ -31,6 +32,13 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [hovered, setHovered]       = useState(null)
   const { dark, toggle }            = useTheme()
+  const { user, isAdmin, signOut }  = useAuth()
+  const navigate                    = useNavigate()
+
+  const handleSignOut = async () => {
+    await signOut()
+    navigate('/')
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full">
@@ -89,8 +97,8 @@ export default function Header() {
             ))}
           </ul>
 
-          {/* 우측 — 다크모드 토글 + 햄버거 */}
-          <div className="flex items-center gap-3">
+          {/* 우측 — 다크모드 토글 + 로그인/유저 + 햄버거 */}
+          <div className="flex items-center gap-2">
             <button
               type="button"
               aria-label={dark ? '라이트 모드로 전환' : '다크 모드로 전환'}
@@ -99,6 +107,30 @@ export default function Header() {
             >
               {dark ? <SunIcon /> : <MoonIcon />}
             </button>
+
+            {/* 데스크탑 로그인/유저 */}
+            <div className="hidden lg:flex items-center gap-2">
+              {user ? (
+                <>
+                  {isAdmin && (
+                    <Link
+                      to="/admin/write"
+                      className="rounded-xl bg-gold/10 dark:bg-gold/20 px-4 py-2 text-sm font-bold text-gold transition hover:bg-gold/20 dark:hover:bg-gold/30"
+                    >+ 글쓰기</Link>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="rounded-xl border border-neutral-200 dark:border-navy-600 px-4 py-2 text-sm font-semibold text-neutral-600 dark:text-neutral-300 transition hover:bg-neutral-100 dark:hover:bg-navy-700"
+                  >로그아웃</button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  className="rounded-xl bg-royal dark:bg-sky px-5 py-2 text-sm font-bold text-white dark:text-navy-950 transition hover:brightness-110"
+                >로그인</Link>
+              )}
+            </div>
 
             <button
               type="button"
@@ -139,11 +171,37 @@ export default function Header() {
             <button
               type="button"
               onClick={toggle}
-              className="mb-6 flex w-full items-center justify-between rounded-xl border border-neutral-200 dark:border-navy-600 px-4 py-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300"
+              className="flex w-full items-center justify-between rounded-xl border border-neutral-200 dark:border-navy-600 px-4 py-3 text-sm font-semibold text-neutral-700 dark:text-neutral-300"
             >
               <span>{dark ? '라이트 모드' : '다크 모드'}</span>
               {dark ? <SunIcon /> : <MoonIcon />}
             </button>
+
+            {/* 모바일 로그인/유저 */}
+            <div className="mb-6 mt-3">
+              {user ? (
+                <div className="flex flex-col gap-2">
+                  {isAdmin && (
+                    <Link
+                      to="/admin/write"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center justify-center rounded-xl bg-gold/10 dark:bg-gold/20 px-4 py-2.5 text-sm font-bold text-gold"
+                    >+ 글쓰기</Link>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => { setMobileOpen(false); handleSignOut() }}
+                    className="rounded-xl border border-neutral-200 dark:border-navy-600 px-4 py-2.5 text-sm font-semibold text-neutral-600 dark:text-neutral-300"
+                  >로그아웃</button>
+                </div>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center rounded-xl bg-royal dark:bg-sky px-4 py-2.5 text-sm font-bold text-white dark:text-navy-950"
+                >로그인</Link>
+              )}
+            </div>
 
             <ul className="flex flex-col gap-1">
               {nav.map((item) => (
